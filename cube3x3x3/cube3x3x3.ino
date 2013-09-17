@@ -2,11 +2,13 @@
 
 /*
  This is to run a 3x3x3 led Rubik's Cube.
- A 3x3x3 cube has 54 square tiles, and 9 total planes that will rotate clockwise or counter clockwise.
+ A 3x3x3 cube has 54 square tiles, and 9 total planes of coloured tiles.
+ The 3 medial planes don't technically rotate, and the centre square of each cube face remains
+ static with respect to the other cube faces.
  Initially the cube is in a solved state, such that the 9 tiles of each side are the same colour.
  Then we apply a series of plane rotations to scrammble the cube.
  (Use a random selection of rotations.)
- Then the user tries to solve the cube using the controls to rotate the planes. 
+ Then the user tries to solve the cube using the controls to rotate the faces of the cube. 
 
  Create an array containing values between 0 and 5.
  Create a transition matrix that can operate on the original array.
@@ -20,17 +22,17 @@
 
 int dataPin = 2;
 int clockPin = 3;
-int numPixels = 24;
+const int numPixels = 108;
 LPD8806 strip = LPD8806(numPixels,dataPin,clockPin);
 
 // Create globals
 
 int numSquares = 54; // Number of square tiles on our cube (2x2x2 cube = 24 squares, 3x3x3 cube = 54 squares)
 
-int arr1[54] = {
+int arrayShow[54] = {
   0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,3,3,3,3,3,3,3,3,3,4,4,4,4,4,4,4,4,4,5,5,5,5,5,5,5,5,5 };
 // Our initial matrix representing the 54 squares.
-int arr2[54] = {
+int arrayTemp[54] = {
   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0 };
 // This is a temp matrix to hold results of any calculations.
 
@@ -911,6 +913,8 @@ int arrTrans7[54][54] = { // arrTrans1[i][j] is a translation matrix. Inv is arr
 void setup() {
   Serial.begin(9600);
   strip.begin();
+  delay(5000);
+  Serial.println("Working");
 }
 
 void loop() {
@@ -918,31 +922,37 @@ void loop() {
   if( (millis() % 5000) == 0) {
     for (int i = 0; i < numSquares; i++) {
       for (int j = 0; j < numSquares; j++) {
-        arr2[i] += arrTrans5[j][i] * arr1[j];
+        arrayTemp[i] += arrTrans5[j][i] * arrayShow[j];
       }
     }
     for (int i = 0; i < numSquares; i++) {
-      arr1[i] = arr2[i];
-      arr2[i] = 0;
-      if (arr1[i] == 0) {
-        strip.setPixelColor(i,127,127,127);
+      arrayShow[i] = arrayTemp[i];
+      arrayTemp[i] = 0;
+      if (arrayShow[i] == 0) {
+        strip.setPixelColor(i*2,127,127,127);
+        strip.setPixelColor(i*2+1,127,127,127);
       }
-      else if (arr1[i] == 1) {
-        strip.setPixelColor(i,127,0,0);
+      else if (arrayShow[i] == 1) {
+        strip.setPixelColor(i*2,127,0,0);
+        strip.setPixelColor(i*2+1,127,0,0);
       }
-      else if (arr1[i] == 2) {
-        strip.setPixelColor(i,0,127,0);
+      else if (arrayShow[i] == 2) {
+        strip.setPixelColor(i*2,0,127,0);
+        strip.setPixelColor(i*2+1,0,127,0);
       }
-      else if (arr1[i] == 3) {
-        strip.setPixelColor(i,0,0,127);
+      else if (arrayShow[i] == 3) {
+        strip.setPixelColor(i*2,0,0,127);
+        strip.setPixelColor(i*2+1,0,0,127);
       }
-      else if (arr1[i] == 4) {
-        strip.setPixelColor(i,127,127,0);
+      else if (arrayShow[i] == 4) {
+        strip.setPixelColor(i*2,127,127,0);
+        strip.setPixelColor(i*2+1,127,127,0);
       }
-      else if (arr1[i] == 5) {
-        strip.setPixelColor(i,0,127,127);
+      else if (arrayShow[i] == 5) {
+        strip.setPixelColor(i*2,0,127,127);
+        strip.setPixelColor(i*2+1,0,127,127);
       }
-      Serial.print(arr1[i]);
+      Serial.print(arrayShow[i]);
       Serial.print(' ');
     }
     Serial.println(' ');
