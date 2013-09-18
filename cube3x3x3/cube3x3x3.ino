@@ -1066,6 +1066,7 @@ void loop() {
     }
   } 
 
+// Placeholder example rotation. Every 5s, rotates one of the cube's planes.
   /*  if( (millis() % 5000) == 0) {
    for (int i = 0; i < numSquares; i++) {
    for (int j = 0; j < numSquares; j++) {
